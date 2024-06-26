@@ -67,15 +67,24 @@ function addWalls(){
 // adds enemies, items, and the player to the board
 function initBoard(){
 
+
     // generate board
     blankBoard();
     addWalls();
 
     // add enemies
+    if(LEVEL == 1){
+        console.log("new enemies!")
+        assignMoveset();
+    }
+
+    
     ENEMY_LIST = [];
     for(let e=0; e<Math.min(7,LEVEL); e++){
         let rp = randExcPos(ENEMY_LIST);
-        let enemy = new Enemy("base_enemy-"+e, rp.x, rp.y);
+        let enemy_name = randChoice(ENEMY_NAMES);
+        let ms = ENEMY_CLASS_MOVE_SETS[enemy_name];
+        let enemy = new Enemy(enemy_name, rp.x, rp.y, ENEMY_LIST.length, ms.moves, ms.move_type);
         ENEMY_LIST.push(enemy);
     }
 
@@ -94,18 +103,19 @@ function initBoard(){
 
     // add player in corner
     let pc = randInt(0,3);
-    move(PLAYER, corners[pc].x,corners[pc].y);
+    moveEnt(PLAYER, corners[pc].x,corners[pc].y);
     PLAYER.show = true;
 
     // add the stairs at opposite corner
     let sc = (pc+2) % 4;
-    move(STAIRS, corners[sc].x, corners[sc].y);
+    moveEnt(STAIRS, corners[sc].x, corners[sc].y);
     STAIRS.show = true;
 
     // add dragons at the other two corners
     for(let c=0;c<2;c++){
         let d = corners[(pc+1+c*2)%4]
-        let dragon = new Enemy("dragon", d.x, d.y);
+        let ds = ENEMY_CLASS_MOVE_SETS["dragon"];
+        let dragon = new Enemy("dragon", d.x, d.y, ENEMY_LIST.length,ds.moves, ds.move_type);
         ENEMY_LIST.push(dragon);
     }
 }
