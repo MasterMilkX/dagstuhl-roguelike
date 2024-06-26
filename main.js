@@ -30,6 +30,7 @@ var GAME_OVER = true;
 var LEVEL = 1;
 var TURN = 0;
 var TOOK_TURN = false;
+var GRAPHIC_MODE = "minimal"
 
 
 
@@ -161,6 +162,7 @@ function render(){
 function init(){
 	reset();
 	console.log("game initialized!");
+	document.getElementById("vfx_btn").innerHTML = GRAPHIC_MODE == "ai" ? "Minimalist Mode" : "Graphic Mode";
 }
 
 // make a new level
@@ -257,4 +259,14 @@ window.addEventListener("keydown", function(e) {
 }, false);
 
 
-main();
+// toogle the type of graphics to show
+function toggleGraphics(){
+	if(GRAPHIC_MODE == "minimal")
+		GRAPHIC_MODE = "ai";
+	else
+		GRAPHIC_MODE = "minimal";
+
+	document.getElementById("vfx_btn").innerHTML = GRAPHIC_MODE == "ai" ? "Minimalist Mode" : "Graphic Mode";
+
+	render();
+}

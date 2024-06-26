@@ -1,5 +1,64 @@
 // ENTITY DEFINITIONS AND BEHAVIOR
 
+// images
+
+var playerIMG = new Image();
+playerIMG.src = "assets/player.png";
+
+var stairsIMG = new Image();
+stairsIMG.src = "assets/stairs.png";
+
+// -- enemies 
+
+var ghostIMG = new Image();
+ghostIMG.src = "assets/ghost.png";
+
+var dragonIMG = new Image();
+dragonIMG.src = "assets/dragon.png";
+
+var goblinIMG = new Image();
+goblinIMG.src = "assets/goblin.png";
+
+var skeletonIMG = new Image();
+skeletonIMG.src = "assets/skeleton.png";
+
+var wolfIMG = new Image();
+wolfIMG.src = "assets/wolf.png";
+
+var scientistIMG = new Image();
+scientistIMG.src = "assets/enemy.png";
+
+var ENEMY_IMGS = {
+    "ghost": ghostIMG,
+    "dragon": dragonIMG,
+    "goblin": goblinIMG,
+    "skeleton": skeletonIMG,
+    "wolf": wolfIMG,
+    "scientist": scientistIMG
+}
+
+// -- items
+var beerIMG = new Image();
+beerIMG.src = "assets/beer.png";   
+
+var eurosIMG = new Image();
+eurosIMG.src = "assets/euros.png";
+
+var coffeeIMG = new Image();
+coffeeIMG.src = "assets/coffee.png";
+
+var cakeIMG = new Image();
+cakeIMG.src = "assets/cake.png";
+
+var ITEM_IMGS = {
+    "beer": beerIMG,
+    "euros": eurosIMG,
+    "coffee": coffeeIMG,
+    "cake": cakeIMG
+}
+
+
+
 var ENEMY_LIST = [];
 var ITEM_LIST = [];
 
@@ -244,35 +303,71 @@ function renderEnt(e){
     if(!e.show)
         return;
 
+    
     if(e.entType == "player"){
-        ctx.fillStyle = "#0000ff";
-        ctx.fillRect((e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x + ((PX_SIZE - e.w)/2), 
-            (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y + ((PX_SIZE - e.h)/2), 
-            e.w, 
-            e.h); 
+        if(GRAPHIC_MODE == "ai" && playerIMG.width > 0){
+            ctx.drawImage(playerIMG, 
+                (e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x, 
+                (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y, 
+                PX_SIZE, 
+                PX_SIZE);
+        }else{
+            ctx.fillStyle = "#0000ff";
+            ctx.fillRect((e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x + ((PX_SIZE - e.w)/2), 
+                (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y + ((PX_SIZE - e.h)/2), 
+                e.w, 
+                e.h);
+        } 
     }
     else if(e.entType == "enemy"){
-        ctx.fillStyle = e.name == "dragon" ? "#00aa00" : "#ff0000" ;
-        ctx.fillRect((e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x + ((PX_SIZE - e.w)/2), 
-            (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y + ((PX_SIZE - e.h)/2), 
-            e.w, 
-            e.h); 
+        let enIMG = ENEMY_IMGS[e.name];
+
+        if(GRAPHIC_MODE == "ai" && enIMG.width > 0){
+            ctx.drawImage(enIMG, 
+                (e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x, 
+                (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y, 
+                PX_SIZE, 
+                PX_SIZE);
+        }else{
+            ctx.fillStyle = e.name == "dragon" ? "#00aa00" : "#ff0000" ;
+            ctx.fillRect((e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x + ((PX_SIZE - e.w)/2), 
+                (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y + ((PX_SIZE - e.h)/2), 
+                e.w, 
+                e.h); 
+        }
     }
     else if(e.entType == "stairs"){
-        ctx.strokeStyle = "#2B7FC0"
-        ctx.lineWidth = "2"
-        ctx.beginPath();
-        ctx.rect((e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x + ((PX_SIZE - e.w)/2), 
-            (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y + ((PX_SIZE - e.h)/2), 
-            e.w, 
-            e.h)
-        ctx.stroke();
+        if(GRAPHIC_MODE == "ai" && stairsIMG.width > 0){
+            ctx.drawImage(stairsIMG, 
+                (e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x, 
+                (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y, 
+                PX_SIZE, 
+                PX_SIZE);
+        }else{
+            ctx.strokeStyle = "#2B7FC0"
+            ctx.lineWidth = "2"
+            ctx.beginPath();
+            ctx.rect((e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x + ((PX_SIZE - e.w)/2), 
+                (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y + ((PX_SIZE - e.h)/2), 
+                e.w, 
+                e.h)
+            ctx.stroke();
+        }
     }else if(e.entType == "item"){
-        ctx.fillStyle = "#E6AD07";
-        ctx.fillRect((e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x + ((PX_SIZE - e.w)/2), 
-            (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y + ((PX_SIZE - e.h)/2), 
-            e.w, 
-            e.h);
+        let itemIMG = ITEM_IMGS[e.name];
+        if(GRAPHIC_MODE == "ai" && itemIMG.width > 0){
+            ctx.drawImage(itemIMG, 
+                (e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x, 
+                (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y, 
+                PX_SIZE, 
+                PX_SIZE);
+        }else{
+            ctx.fillStyle = "#E6AD07";
+            ctx.fillRect((e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x + ((PX_SIZE - e.w)/2), 
+                (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y + ((PX_SIZE - e.h)/2), 
+                e.w, 
+                e.h);
+        }
     }
 }
     
