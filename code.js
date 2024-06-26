@@ -1,8 +1,8 @@
 //set up the canvas
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
-canvas.width = 320;
-canvas.height = 320;
+canvas.width = 480;
+canvas.height = 480;
 
 var size = 16;
 
@@ -104,7 +104,7 @@ function render(){
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	
 	//background
-	ctx.fillStyle = "#dedede";
+	ctx.fillStyle = "#3e3e3e";
 	ctx.fillRect(0,0,canvas.width, canvas.height);
 	
 	/*   add draw functions here  */
@@ -151,26 +151,26 @@ function main(){
 
 //determine if valud key to press
 document.body.addEventListener("keydown", function (e) {
-	if(inArr(moveKeySet, e.keyCode)){
-		keys[e.keyCode] = true;
-	}else if(inArr(actionKeySet, e.keyCode)){
-		keys[e.keyCode] = true;
+	if(inArr(moveKeySet, e.code)){
+		keys[e.code] = true;
+	}else if(inArr(actionKeySet, e.code)){
+		keys[e.code] = true;
 	}
 });
 
 //check for key released
 document.body.addEventListener("keyup", function (e) {
-	if(inArr(moveKeySet, e.keyCode)){
-		keys[e.keyCode] = false;
-	}else if(inArr(actionKeySet, e.keyCode)){
-		keys[e.keyCode] = false;
+	if(inArr(moveKeySet, e.code)){
+		keys[e.code] = false;
+	}else if(inArr(actionKeySet, e.code)){
+		keys[e.code] = false;
 	}
 });
 
 //prevent scrolling with the game
 window.addEventListener("keydown", function(e) {
     // space and arrow keys
-    if(([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1)){
+    if(([32, 37, 38, 39, 40].indexOf(e.code) > -1)){
         e.preventDefault();
     }
 }, false);
