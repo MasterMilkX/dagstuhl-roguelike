@@ -1,0 +1,4 @@
+{
+  "image": "node:lts",
+  "runArgs": ["--network=host", "--ipc=host"]
+}
