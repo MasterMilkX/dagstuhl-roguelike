@@ -1,6 +1,7 @@
 // ENTITY DEFINITIONS AND BEHAVIOR
 
 var ENEMY_LIST = [];
+var ITEM_LIST = [];
 
 // main player object
 var PLAYER = {
@@ -10,7 +11,7 @@ var PLAYER = {
     h : 20,
     max_hp : 4,
     hp : 4,
-    cur_item : "",
+    score : 0,
     show : false,
     entType : "player",
 
@@ -30,6 +31,41 @@ var STAIRS = {
     h : 10,
     show : false,
     entType : "stairs"
+}
+
+// item class
+
+var ITEM_NAMES = ["beer", "euros", "coffee", "cake"]
+var ITEM_VALUES = [1, 2, 5, 10]
+
+var ITEM_ASSIGNMENT = {};
+var ITEM_RANGE = {min:1, max:4};
+
+class Item{
+    constructor(x, y, name, value){
+        this.x = x;
+        this.y = y;
+        this.w = 8;
+        this.h = 8;
+        this.show = true;
+
+        this.entType = "item";
+        this.value = value;
+        this.name = name;
+    }
+
+    // remove from item list
+    collect(){
+        this.show = false;
+        PLAYER.score += this.value;
+        message = "Collected " + this.name + "! Worth [" + this.value +"]!";
+        let idx = ITEM_LIST.indexOf(this);
+        if(idx > -1){
+            ITEM_LIST.splice(idx, 1);
+        }
+    
+    }
+
 }
 
 // enemy class
@@ -101,7 +137,7 @@ class Enemy{
     die(){
         this.show = false;
         PLAYER.hp -= 1;
-        console.log(this.id + " [" + this.name + "] died!")
+        message = "[" + this.name + "] died! -1 HP!"
         let idx = ENEMY_LIST.indexOf(this);
         if(idx > -1){
             ENEMY_LIST.splice(idx, 1);
@@ -192,6 +228,15 @@ function assignMoveset(){
     ENEMY_CLASS_MOVE_SETS["dragon"] = {"moves":BASIC_MOVESET, "move_type":"optimal"};
 }   
 
+// gives random values to the items
+function assignItems(){
+    ITEM_ASSIGNMENT = {};
+    let copy_names = [...ITEM_NAMES]
+    for(let n=0;n<ITEM_NAMES.length;n++){
+        ITEM_ASSIGNMENT[copy_names[n]] = ITEM_VALUES[n];
+    }
+}
+
 
 // draw the entity on the board
 // TODO: use sprites
@@ -222,6 +267,12 @@ function renderEnt(e){
             e.w, 
             e.h)
         ctx.stroke();
+    }else if(e.entType == "item"){
+        ctx.fillStyle = "#E6AD07";
+        ctx.fillRect((e.x)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.x + ((PX_SIZE - e.w)/2), 
+            (e.y)*(PX_SIZE + BOARD_PAD) + BOARD_OFFSET.y + ((PX_SIZE - e.h)/2), 
+            e.w, 
+            e.h);
     }
 }
     
@@ -231,6 +282,9 @@ function drawEntities(){
     for(let e of ENEMY_LIST){
         renderEnt(e);
         e.drawMoves();
+    }
+    for(let i of ITEM_LIST){
+        renderEnt(i);
     }
     renderEnt(PLAYER);
     renderEnt(STAIRS);

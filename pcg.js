@@ -67,17 +67,16 @@ function addWalls(){
 // adds enemies, items, and the player to the board
 function initBoard(){
 
-
     // generate board
     blankBoard();
     addWalls();
 
     // add enemies
     if(LEVEL == 1){
-        console.log("new enemies!")
+        console.log("new enemies and items!")
         assignMoveset();
+        assignItems();
     }
-
     
     ENEMY_LIST = [];
     for(let e=0; e<Math.min(7,LEVEL); e++){
@@ -86,6 +85,16 @@ function initBoard(){
         let ms = ENEMY_CLASS_MOVE_SETS[enemy_name];
         let enemy = new Enemy(enemy_name, rp.x, rp.y, ENEMY_LIST.length, ms.moves, ms.move_type);
         ENEMY_LIST.push(enemy);
+    }
+
+    // add collectables
+    let num_items = randInt(ITEM_RANGE.min, ITEM_RANGE.max);
+    ITEM_LIST = [];
+    for(let i=0;i<num_items;i++){
+        let rp = randExcPos(ENEMY_LIST);
+        let rand_item = randChoice(ITEM_NAMES);
+        let item = new Item(rp.x, rp.y, rand_item, ITEM_ASSIGNMENT[rand_item]);
+        ITEM_LIST.push(item);
     }
 
     // make four corners and add player and stairs
@@ -117,6 +126,13 @@ function initBoard(){
         let ds = ENEMY_CLASS_MOVE_SETS["dragon"];
         let dragon = new Enemy("dragon", d.x, d.y, ENEMY_LIST.length,ds.moves, ds.move_type);
         ENEMY_LIST.push(dragon);
+    }
+
+    // if enemy at player position, remove it
+    for(let e=0;e<ENEMY_LIST.length;e++){
+        if(samePos(PLAYER, ENEMY_LIST[e])){
+            ENEMY_LIST.splice(e,1);
+        }
     }
 }
 

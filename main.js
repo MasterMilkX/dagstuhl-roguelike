@@ -104,6 +104,13 @@ function gameStep(dir){
 		e.move();
 	}
 
+	// pickup item
+	for(let i of ITEM_LIST){
+		if(samePos(PLAYER, i)){
+			i.collect();
+		}
+	}
+
 	// CHECK IF ENEMY AT POSITION - IF SO, LOSE HEART
 	for(let e of ENEMY_LIST){
 		if(samePos(PLAYER, e)){
@@ -136,19 +143,11 @@ function render(){
 	drawBoard();			//draw the board
 	drawEntities();			//draw the entities [player, enemies, stairs]
 	drawUI();				//draw the UI
+	drawMsg();
 
 	// if game over, draw the screen
 	if(GAME_OVER){
-		ctx.fillStyle = "#000000";
-		ctx.globalAlpha = 0.75;
-		ctx.fillRect(0,0,canvas.width, canvas.height);
-
-		ctx.fillStyle = "#FFFFFF";
-		ctx.textAlign = "center";
-		ctx.font = "24px Arial";
-		ctx.fillText("GAME OVER", canvas.width/2, 240);
-		ctx.font = "18px Arial"
-		ctx.fillText("Press 'R' to restart", canvas.width/2, 280);
+		drawGameOver();
 	}
 
 	ctx.restore();
@@ -175,7 +174,7 @@ function newLevel(){
 function reset(){
 	PLAYER.hp = PLAYER.max_hp;
 	console.log(PLAYER.hp);
-	PLAYER.cur_item = "";
+	PLAYER.score = 0;
 	PLAYER.show = true;
 	LEVEL = 1;
 	TURN = 0;
@@ -194,6 +193,8 @@ function main(){
 	//if key still held down, return
 	if(TOOK_TURN)
 		return;
+	else
+		message = "";
 
 	if(GAME_OVER){
 		render();
