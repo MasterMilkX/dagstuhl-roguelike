@@ -160,7 +160,7 @@ function getGameState(){
     for(let i=0;i<BOARD_SIZE;i++){
         game_arr.push([]);
         for(let j=0;j<BOARD_SIZE;j++){
-           if(BOARD_LAYOUT[j][i] == 1)
+           if(BOARD_LAYOUT[i][j] == 1)
                game_arr[i].push("#");
             else    
                 game_arr[i].push(".");
