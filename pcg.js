@@ -16,6 +16,7 @@ var BOARD_OFFSET = {
 
 var WALL_set = {
     "island": [[1,1],[1,1]],
+    "island2": [[1,1],[1,1]],
     "hor_jut": [[1,1,1]],
     "vert_jut": [[1],[1],[1]],
     "single": [[1]]
@@ -149,5 +150,42 @@ function drawBoard(){
             }
         }
     }
+}
 
+// retrieves board as a ascii 2d array
+function getGameState(){
+    let game_arr = [];
+
+    // add walls and floors
+    for(let i=0;i<BOARD_SIZE;i++){
+        game_arr.push([]);
+        for(let j=0;j<BOARD_SIZE;j++){
+           if(BOARD_LAYOUT[j][i] == 1)
+               game_arr[i].push("#");
+            else    
+                game_arr[i].push(".");
+        }
+    }
+
+    // add enemies
+    for(let e of ENEMY_LIST){
+        game_arr[e.y][e.x] = (e.name == "dragon" ? "&" : "e");
+    }
+    // add players
+    game_arr[PLAYER.y][PLAYER.x] = "@";
+
+    // add stairs
+    game_arr[STAIRS.y][STAIRS.x] = ">";
+
+    return game_arr;
+}
+
+// returns board as a string
+function getGameStateStr(){
+    let game_arr = getGameState();
+    let game_str = "";
+    for(let i=0;i<game_arr.length;i++){
+        game_str += game_arr[i].join("") + "\n";
+    }
+    return game_str;
 }
