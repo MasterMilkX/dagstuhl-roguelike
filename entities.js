@@ -145,6 +145,14 @@ class Enemy{
         this.entType = "enemy";
         this.move_set = move_set == null ? BASIC_MOVESET : move_set;
         this.move_type = move_type;      // random or optimal
+        this.description = "LLAMA is Loading"
+        let thisRef = this
+        generate_text(WLLAMA_INSTANCE ,"Short description for enemy type " + name + ":").then(
+            (desc) => {
+                console.log("DEsc is", desc)
+                thisRef.description = desc
+            }
+        )
     }
 
     // picks a random move from the move set
