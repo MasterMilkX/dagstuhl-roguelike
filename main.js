@@ -1,16 +1,10 @@
+// MAIN GAME LOOP CODE
+
 //set up the canvas
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 canvas.width = 480;
 canvas.height = 480;
-
-var size = 16;
-
-//camera
-var camera = {
-	x : 0,
-	y : 0
-};
 
 
 //KEYS
@@ -31,8 +25,9 @@ var actionKeySet = [shift_key,a_key, b_key];
 var keys = [];
 
 
-
-var LEVEL = 0;
+/// GAME VARIABLES
+var GAME_OVER = true;
+var LEVEL = 1;
 var TURN = 0;
 var TOOK_TURN = false;
 
@@ -73,7 +68,13 @@ function anyActionKey(){
 
 ////////////////   GAME FUNCTIONS   /////////////////
 
+// check if the game is ready to be played
+function gameReady(){return BOARD_LAYOUT.length > 0;}
+
+// game loop / turn function
 function gameStep(dir){
+	if(!gameReady())
+		return;
 
 	let double_move = keys[shift_key] ? 2 : 1;
 
@@ -88,54 +89,30 @@ function gameStep(dir){
 	if(keys[rightKey])
 		p_pos.x += 1*double_move;
 	
+	// check if the player can move to the new position
 	if(!oob(p_pos.x, p_pos.y) && BOARD_LAYOUT[p_pos.y][p_pos.x] == 0)
 		move(PLAYER, p_pos.x, p_pos.y);
 
+	// if player reaches the stairs, increase the level
 	if(samePos(PLAYER, STAIRS)){
-		console.log("WINNER!");
-		reset();
+		newLevel();
 		LEVEL++;
 	}
 
 	// CHECK IF ENEMY AT POSITION - IF SO, LOSE HEART
+	for(let e of ENEMY_LIST){
+		if(samePos(PLAYER, e)){
+			PLAYER.hp -= 1;
+			e.die();
+			if(PLAYER.hp <= 0)
+				end_game();
+		}
+	}
 
 	// TODO: move the enemies
 
+
 }
-
-
-////////////////   CAMERA FUNCTIONS   /////////////////
-
-/*  OPTIONAL IF LARGE GAME MAP
-//if within the game bounds
-function withinBounds(x,y){
-	var xBound = (x >= Math.floor(camera.x / size) - 1) && (x <= Math.floor(camera.x / size) + (canvas.width / size));
-	return xBound;
-}
-
-//have the camera follow the player
-function panCamera(){
-	camera.x = 0;
-	camera.y = 0;
-
-	if(map.length != 0 && player.x > ((map[0].length) - ((canvas.width/size)/2)))
-		camera.x = (map[0].length * size) - canvas.width;
-	else if(player.x < ((canvas.width/size)/2))
-		camera.y = 0;
-	else
-		camera.x = player.x *size - (canvas.width / 2);
-
-	if(map.length != 0 && player.y > ((map.length) - ((canvas.height/size) / 2)))
-		camera.y = (map.length * size) - canvas.height;
-	else if(player.y < ((canvas.height/size)/2))
-		camera.y = 0;
-	else
-		camera.y = player.y *size - (canvas.height / 2) + (size/2);
-
-	camera.x += cam_offset.x;
-	camera.y += cam_offset.y;
-}
-*/
 
 
 //////////////////  RENDER FUNCTIONS  ////////////////////
@@ -153,9 +130,24 @@ function render(){
 	
 	/*   add draw functions here  */
 
-	drawBoard();
-	drawEntities();
-	
+	drawBoard();			//draw the board
+	drawEntities();			//draw the entities [player, enemies, stairs]
+	drawUI();				//draw the UI
+
+	// if game over, draw the screen
+	if(GAME_OVER){
+		ctx.fillStyle = "#000000";
+		ctx.globalAlpha = 0.75;
+		ctx.fillRect(0,0,canvas.width, canvas.height);
+
+		ctx.fillStyle = "#FFFFFF";
+		ctx.textAlign = "center";
+		ctx.font = "24px Arial";
+		ctx.fillText("GAME OVER", canvas.width/2, 240);
+		ctx.font = "18px Arial"
+		ctx.fillText("Press 'R' to restart", canvas.width/2, 280);
+	}
+
 	ctx.restore();
 }
 
@@ -166,20 +158,29 @@ function render(){
 //game initialization function
 function init(){
 	reset();
-	main();
-	LEVEL = 0;
 	console.log("game initialized!");
-	// setTimeout(function(){
-		
-	// 	console.log("game start!");
-	// },500);
 }
 
-function reset(){
+// make a new level
+function newLevel(){
 	TURN = 0;
-	TOOK_TURN = false;
 	initBoard();
 	render();
+}
+
+// reset the game
+function reset(){
+	PLAYER.hp = PLAYER.max_hp;
+	console.log(PLAYER.hp);
+	PLAYER.cur_item = "";
+	PLAYER.show = true;
+	LEVEL = 1;
+	TURN = 0;
+	TOOK_TURN = false;
+	GAME_OVER = false;
+	newLevel();
+	main();
+	console.log("Game reset!");
 }
 
 //main game loop
@@ -187,8 +188,14 @@ function main(){
 	// requestAnimationFrame(main);
 	canvas.focus();
 
+	//if key still held down, return
 	if(TOOK_TURN)
 		return;
+
+	if(GAME_OVER){
+		render();
+		return;
+	}
 
 	gameStep();
 	render();
@@ -199,6 +206,14 @@ function main(){
 	TOOK_TURN = true;
 
 	//document.getElementById('debug').innerHTML = settings;
+}
+
+
+function end_game(){
+	GAME_OVER = true;
+	PLAYER.show = false;
+	render();
+
 }
 
 
@@ -213,10 +228,9 @@ document.body.addEventListener("keydown", function (e) {
 		keys[e.code] = true;
 	} 
 
+	// reset the game
 	if(e.code == "KeyR"){
-		TOOK_TURN = false;
 		reset();
-		console.log("RESET!");
 	}  
 });
 
@@ -227,7 +241,6 @@ document.body.addEventListener("keyup", function (e) {
 		TOOK_TURN = false;
 	}else if(inArr(actionKeySet, e.code)){
 		keys[e.code] = false;
-		TOOK_TURN = false;
 	}
 });
 

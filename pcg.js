@@ -1,15 +1,14 @@
-var BOARD_SIZE = 8
+// PROC-GEN CODE
+
 var PX_SIZE = 32;
+
+var BOARD_SIZE = 8
 var BOARD_PAD = 4;
-
 var BOARD_LAYOUT = []
-
 var BOARD_COLORS = {
     0 : "#DFDFDF",
     1 : "#BDBDBD"
 }
-
-
 var BOARD_OFFSET = {
     x : 100,
     y : 120
@@ -36,17 +35,19 @@ function blankBoard(){
 // adds walls to the board
 // preset walls: islands, jutting, single
 function addWalls(){
+    // min and max number of walls in level
     var WALL_RANGE = {
         min : 2,
         max : 5
     }
 
-
+    // board not rendered
     if(BOARD_LAYOUT.length == 0){  
         console.log("board not initialized")
         return;
     }
 
+    // add walls to game
     let num_walls = Math.floor(Math.random()*WALL_RANGE.max) + WALL_RANGE.min;
     for(let w=0;w<num_walls;w++){
         let wall_type = Object.keys(WALL_set)[Math.floor(Math.random()*Object.keys(WALL_set).length)];
@@ -69,23 +70,43 @@ function initBoard(){
     blankBoard();
     addWalls();
 
-    let pp = randExcPos();
-    move(PLAYER, pp.x, pp.y);
-    PLAYER.show = true;
-
     // add enemies
     ENEMY_LIST = [];
-    for(let e=0; e<NUM_ENEMIES; e++){
-        let rp = randExcPos();
-        let hp = Math.floor(Math.random()*3) + 1;
-        let enemy = new Enemy("enemy"+e, rp.x, rp.y, hp);
+    for(let e=0; e<Math.min(7,LEVEL); e++){
+        let rp = randExcPos(ENEMY_LIST);
+        let enemy = new Enemy("base_enemy-"+e, rp.x, rp.y);
         ENEMY_LIST.push(enemy);
     }
 
-    // add the stairs
-    let sp = randExcPos(ENEMY_LIST);
-    move(STAIRS, sp.x, sp.y);
+    // make four corners and add player and stairs
+    let corners = [
+        {x:0, y:0},
+        {x:0, y:BOARD_SIZE-1},
+        {x:BOARD_SIZE-1, y:BOARD_SIZE-1},
+        {x:BOARD_SIZE-1, y:0}
+    ]
+
+    // remove corner walls
+    for(let c=0;c<corners.length;c++){
+        BOARD_LAYOUT[corners[c].y][corners[c].x] = 0;
+    }
+
+    // add player in corner
+    let pc = randInt(0,3);
+    move(PLAYER, corners[pc].x,corners[pc].y);
+    PLAYER.show = true;
+
+    // add the stairs at opposite corner
+    let sc = (pc+2) % 4;
+    move(STAIRS, corners[sc].x, corners[sc].y);
     STAIRS.show = true;
+
+    // add dragons at the other two corners
+    for(let c=0;c<2;c++){
+        let d = corners[(pc+1+c*2)%4]
+        let dragon = new Enemy("dragon", d.x, d.y);
+        ENEMY_LIST.push(dragon);
+    }
 }
 
 // renders the board setup
