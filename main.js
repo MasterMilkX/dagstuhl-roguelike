@@ -16,18 +16,25 @@ var camera = {
 //KEYS
 
 // directionals
-var upKey = 38;     //[Up]
-var leftKey = 37;   //[Left]
-var rightKey = 39;  //[Rigt]
-var downKey = 40;   //[Down]
+var upKey = "ArrowUp";     //[Up]
+var leftKey = "ArrowLeft";   //[Left]
+var rightKey = "ArrowRight";  //[Rigt]
+var downKey = "ArrowDown";   //[Down]
 var moveKeySet = [upKey, leftKey, rightKey, downKey];
 
 // A and b
-var a_key = 90;   //[Z]
-var b_key = 88;   //[X]
-var actionKeySet = [a_key, b_key];
+var a_key = "KeyA";   //[Z]
+var b_key = "KeyB";   //[X]
+var shift_key = "ShiftLeft";  //[Shift]
+var actionKeySet = [shift_key,a_key, b_key];
 
 var keys = [];
+
+
+
+var LEVEL = 0;
+var TURN = 0;
+var TOOK_TURN = false;
 
 
 
@@ -60,6 +67,40 @@ function anyMoveKey(){
 
 function anyActionKey(){
 	return (keys[a_key] || keys[b_key]);
+}
+
+
+
+////////////////   GAME FUNCTIONS   /////////////////
+
+function gameStep(dir){
+
+	let double_move = keys[shift_key] ? 2 : 1;
+
+	// move the player
+	let p_pos = {x: PLAYER.x, y: PLAYER.y};
+	if(keys[upKey])
+		p_pos.y -= 1*double_move;
+	if(keys[downKey])
+		p_pos.y += 1*double_move;
+	if(keys[leftKey])
+		p_pos.x -= 1*double_move;
+	if(keys[rightKey])
+		p_pos.x += 1*double_move;
+	
+	if(!oob(p_pos.x, p_pos.y) && BOARD_LAYOUT[p_pos.y][p_pos.x] == 0)
+		move(PLAYER, p_pos.x, p_pos.y);
+
+	if(samePos(PLAYER, STAIRS)){
+		console.log("WINNER!");
+		reset();
+		LEVEL++;
+	}
+
+	// CHECK IF ENEMY AT POSITION - IF SO, LOSE HEART
+
+	// TODO: move the enemies
+
 }
 
 
@@ -124,30 +165,38 @@ function render(){
 
 //game initialization function
 function init(){
+	reset();
+	main();
+	LEVEL = 0;
+	console.log("game initialized!");
+	// setTimeout(function(){
+		
+	// 	console.log("game start!");
+	// },500);
+}
+
+function reset(){
+	TURN = 0;
+	TOOK_TURN = false;
 	initBoard();
+	render();
 }
 
 //main game loop
 function main(){
-	requestAnimationFrame(main);
+	// requestAnimationFrame(main);
 	canvas.focus();
 
-	//panCamera();
+	if(TOOK_TURN)
+		return;
 
+	gameStep();
 	render();
-
-	//keyboard ticks
-	var akey = anyKey();
-	if(akey && kt == 0){
-		kt = setInterval(function(){keyTick+=1}, 75);
-	}else if(!akey){
-		clearInterval(kt);
-		kt = 0;
-		keyTick=0;
-	}
+	TURN++;
 
 	//debug
 	var settings = "debug here";
+	TOOK_TURN = true;
 
 	//document.getElementById('debug').innerHTML = settings;
 }
@@ -159,17 +208,26 @@ function main(){
 document.body.addEventListener("keydown", function (e) {
 	if(inArr(moveKeySet, e.code)){
 		keys[e.code] = true;
+		main();
 	}else if(inArr(actionKeySet, e.code)){
 		keys[e.code] = true;
-	}
+	} 
+
+	if(e.code == "KeyR"){
+		TOOK_TURN = false;
+		reset();
+		console.log("RESET!");
+	}  
 });
 
 //check for key released
 document.body.addEventListener("keyup", function (e) {
 	if(inArr(moveKeySet, e.code)){
 		keys[e.code] = false;
+		TOOK_TURN = false;
 	}else if(inArr(actionKeySet, e.code)){
 		keys[e.code] = false;
+		TOOK_TURN = false;
 	}
 });
 
