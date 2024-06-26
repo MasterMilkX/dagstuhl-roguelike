@@ -12,6 +12,7 @@ var camera = {
 	y : 0
 };
 
+
 //KEYS
 
 // directionals
@@ -98,16 +99,21 @@ function panCamera(){
 
 //////////////////  RENDER FUNCTIONS  ////////////////////
 
+
+// main render function
 function render(){
 	ctx.save();
 	//ctx.translate(-camera.x, -camera.y);		//camera
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	
 	//background
-	ctx.fillStyle = "#3e3e3e";
+	ctx.fillStyle = "#B2B2B2";
 	ctx.fillRect(0,0,canvas.width, canvas.height);
 	
 	/*   add draw functions here  */
+
+	drawBoard();
+	drawEntities();
 	
 	ctx.restore();
 }
@@ -118,7 +124,7 @@ function render(){
 
 //game initialization function
 function init(){
-
+	initBoard();
 }
 
 //main game loop
