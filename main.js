@@ -90,8 +90,8 @@ function gameStep(dir){
 		p_pos.x += 1*double_move;
 	
 	// check if the player can move to the new position
-	if(!oob(p_pos.x, p_pos.y) && BOARD_LAYOUT[p_pos.y][p_pos.x] == 0)
-		move(PLAYER, p_pos.x, p_pos.y);
+	if(validPos(p_pos.x, p_pos.y))
+		PLAYER.move(p_pos.x, p_pos.y);
 
 	// if player reaches the stairs, increase the level
 	if(samePos(PLAYER, STAIRS)){
@@ -99,17 +99,20 @@ function gameStep(dir){
 		LEVEL++;
 	}
 
+	// move the enemies based on their moveset
+	for(let e of ENEMY_LIST){
+		e.move();
+	}
+
 	// CHECK IF ENEMY AT POSITION - IF SO, LOSE HEART
 	for(let e of ENEMY_LIST){
 		if(samePos(PLAYER, e)){
-			PLAYER.hp -= 1;
 			e.die();
-			if(PLAYER.hp <= 0)
-				end_game();
 		}
 	}
 
-	// TODO: move the enemies
+	if(PLAYER.hp <= 0)
+		end_game();
 
 
 }

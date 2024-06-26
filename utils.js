@@ -64,3 +64,35 @@ function oob(x,y){
 function samePos(a,b){
     return (a.x == b.x && a.y == b.y);
 }
+
+// check if a position is valid with respect to walls as well
+function validPos(x,y){
+    return (!oob(x,y) && BOARD_LAYOUT[y][x] == 0);
+}
+
+// get the enemy at a specific position
+function enemyAtPos(x,y){
+    for(let i=0;i<ENEMY_LIST.length;i++){
+        if(ENEMY_LIST[i].x == x && ENEMY_LIST[i].y == y)
+            return ENEMY_LIST[i];
+    }
+    return null;
+}
+
+// make a deep copy of an object
+function deepCopy(obj){
+    return JSON.parse(JSON.stringify(obj));
+}
+
+// checks if an element is in an array
+function inArr(e,arr){
+    if(arr.length == 0)
+        return false;
+    return arr.indexOf(e) !== -1
+}
+
+function inArrDeep(e,arr){
+    // convert all elements to string
+    let arr_str = arr.map(x => JSON.stringify(x));
+    return arr_str.indexOf(JSON.stringify(e)) !== -1;
+}
